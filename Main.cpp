@@ -32,7 +32,7 @@ int main()
 	std::vector<Vertex> marsVertices = marsSphere.getVertices(false);
 	std::vector<GLuint> marsIndices = marsSphere.getIndices();
 
-	Sphere jupiterSphere = Sphere(glm::vec3(18.0f, 0.0f, 0.0f), 7.0f, sectorCount, stackCount); // x-pos: 52.0f
+	Sphere jupiterSphere = Sphere(glm::vec3(30.0f, 0.0f, 0.0f), 7.0f, sectorCount, stackCount); // x-pos: 52.0f
 	std::vector<Vertex> jupiterVertices = jupiterSphere.getVertices(false);
 	std::vector<GLuint> jupiterIndices = jupiterSphere.getIndices();
 
@@ -84,16 +84,16 @@ int main()
 
 
 
-	std::vector<Texture> sunTexture = { Texture("sun_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
-	std::vector<Texture> mercuryTexture = { Texture("mercury_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
-	std::vector<Texture> venusTexture = { Texture("venus_sphere_surf.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
-	std::vector<Texture> earthTexture = { Texture("earth_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
-	std::vector<Texture> marsTexture = { Texture("mars_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
-	std::vector<Texture> jupiterTexture = { Texture("jupiter_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
-	std::vector<Texture> saturnTexture = { Texture("saturn_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
-	std::vector<Texture> uranusTexture = { Texture("uranus_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
-	std::vector<Texture> neptuneTexture = { Texture("neptune_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
-	std::vector<Texture> backgroundTexture = { Texture("night_sky_sphere_hd.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
+	std::vector<Texture> sunTexture = { Texture("Textures/sun_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
+	std::vector<Texture> mercuryTexture = { Texture("Textures/mercury_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
+	std::vector<Texture> venusTexture = { Texture("Textures/venus_sphere_surf.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
+	std::vector<Texture> earthTexture = { Texture("Textures/earth_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
+	std::vector<Texture> marsTexture = { Texture("Textures/mars_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
+	std::vector<Texture> jupiterTexture = { Texture("Textures/jupiter_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
+	std::vector<Texture> saturnTexture = { Texture("Textures/saturn_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
+	std::vector<Texture> uranusTexture = { Texture("Textures/uranus_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
+	std::vector<Texture> neptuneTexture = { Texture("Textures/neptune_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
+	std::vector<Texture> backgroundTexture = { Texture("Textures/night_sky_sphere_hd.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
 
 
 	static Physics physics;
