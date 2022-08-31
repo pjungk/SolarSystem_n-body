@@ -125,7 +125,7 @@ void Mesh::changePosition(int vertexSize, Physics physics)
 		// Generate new position of the vertex based on the new center
 		glm::vec3 pos = glm::vec3(position.x + distanceVector.x, position.y + distanceVector.y, position.z + distanceVector.z);
 		// Add new vertex position to vertices
-		new_vertices.push_back(Vertex{ pos, vertices[i].color, vertices[i].normal, vertices[i].texUV });
+		new_vertices.push_back(Vertex{ pos, vertices[i].normal, vertices[i].color, vertices[i].texUV });
 	}
 
 	// Update vertices
