@@ -9,8 +9,7 @@
 static class Physics
 {
 public:
-	// Seconds per timestep and count of planets + sun
-	static const int timestep = 8640;
+	// Count of planets + sun
 	static const int objectCount = 9;
 
 	// Constructor
@@ -31,9 +30,12 @@ public:
 	// Position and velocity of planet
 	static glm::vec3 positions[objectCount];
 	static glm::vec3 velocities[objectCount];
+	static glm::vec3 rotationVector[objectCount];
+	static float rotationVelocity[objectCount];
 
 
 private:
+	static float timestep;
 	// Needed constants to be close to real life movements
 	static long long int masses[objectCount];
 	static std::string IDs[objectCount];
@@ -44,6 +46,8 @@ private:
 	static float astronomicalUnit;
 	static bool initialized[objectCount];
 	static long long int massScaling;
+	// Needed Constants for Rotation
+	static float rotationAxis[objectCount];
 };
 
 #endif

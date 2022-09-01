@@ -1,6 +1,7 @@
 #include "Physics.h"
 
 
+float Physics::timestep = 8640.0f;
 // Initialize scales
 float Physics::astronomicalUnit = 150000000000.0f;
 float Physics::positionScalingAU[Physics::objectCount] = { 0.0f, 0.4f, 0.7f, 1.0f, 1.5f, 5.2f, 9.5f, 19.2f, 30.1f };
@@ -14,6 +15,10 @@ glm::vec3 Physics::positions[Physics::objectCount] = {};
 glm::vec3 Physics::velocities[Physics::objectCount] = {};
 float Physics::gravity_constant = 6.67430e-11;
 bool Physics::initialized[Physics::objectCount] = { false, false, false, false, false, false, false, false, false };
+// Initialization of rotation variables
+float Physics::rotationVelocity[Physics::objectCount] =	{ 14.18f,	6.14f,		-1.48f,		360.99f,	350.89f,	870.54f,	810.79f,	-501.16f,	536.31f };
+float Physics::rotationAxis[Physics::objectCount] =		{ 7.25f,	0.034f,		177.36f,	23.44f,		25.19f,		3.13f,		26.73f,		97.77f,		28.32f};
+glm::vec3 Physics::rotationVector[Physics::objectCount] = {};
 
 
 // Constructor (initializing position and velocity variable)
@@ -23,6 +28,10 @@ Physics::Physics()
 	{
 		positions[i] = glm::vec3(0.0f, 0.0f, 0.0f);
 		velocities[i] = glm::vec3(0.0f, 0.0f, 0.0f);
+		// Convert from degree to radian and intitialize rotation parameters of celestial body
+		rotationVelocity[i] *= 1 / 86400.0f * timestep * acos(-1) / 180.0f / 10; // Divided by ten to make it more visually pleasing
+		rotationAxis[i] *= acos(-1) / 180.0f;
+		rotationVector[i] = glm::normalize(glm::vec3(sin(rotationAxis[i] * acos(-1)/180.0f), cos(rotationAxis[i] * acos(-1) / 180.0f), 0.0f));
 	}
 }
 

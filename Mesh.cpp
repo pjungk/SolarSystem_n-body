@@ -7,6 +7,20 @@ Mesh::Mesh(std::vector <Vertex>& vertices, std::vector <GLuint>& indices, std::v
 	Mesh::indices = indices;
 	Mesh::textures = textures;
 
+	std::vector <Vertex> initialRotationChange;
+	// Get current position of center
+	glm::vec3 center = getCenter(vertices, vertices.size());
+
+	// Iterate ove every vertex
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		Vertex newVertexPosition = rotate(center, vertices[i].position, vertices[i], glm::vec3(1.0f, 0.0f, 0.0f), acos(-1) / 2.0f);
+		// Add new vertex position to vertices
+		initialRotationChange.push_back(newVertexPosition);
+	}
+	Mesh::vertices = initialRotationChange;
+
+
 	VAO.Bind();
 	// Generates Vertex Buffer Object and links it to vertices
 	VBO.Make(vertices);
@@ -23,7 +37,6 @@ Mesh::Mesh(std::vector <Vertex>& vertices, std::vector <GLuint>& indices, std::v
 	EBO.Unbind();
 
 
-
 	std::vector <glm::vec3> object;
 
 	for (long i = 0l; i < Mesh::vertices.size(); i++)
@@ -33,7 +46,7 @@ Mesh::Mesh(std::vector <Vertex>& vertices, std::vector <GLuint>& indices, std::v
 
 	ID_num = physics.initializePosition(object, Mesh::name);
 
-	int a = 1;
+	PI = acos(-1);
 }
 
 
@@ -62,6 +75,7 @@ void Mesh::Draw(Shader& shader, Camera& camera)
 		textures[i].texUnit(shader, (type + num).c_str(), i);
 		textures[i].Bind();
 	}
+
 	// Take care of the camera Matrix
 	glUniform3f(glGetUniformLocation(shader.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 	camera.Matrix(shader, "camMatrix");
@@ -72,64 +86,26 @@ void Mesh::Draw(Shader& shader, Camera& camera)
 
 void Mesh::changePosition(int vertexSize, Physics physics)
 {
-
-	float PI = acos(-1);
 	float stepsize = 1.0f / 200.0f * PI;
 	std::vector <Vertex> new_vertices;
 
-	// Circle around origin
-	/*
-	for (int i = 0; i < vertexSize; i++)
-	{
-		glm::vec3 old_pos = vertices[i].position;
-		float radius = sqrtf(pow(old_pos.x,2) + pow(old_pos.z, 2));
-		float angle = acosf(old_pos.x/(sqrtf(pow(old_pos.x, 2) + pow(old_pos.z, 2))));
-		// float angle = atanf(old_pos.x / old_pos.z) + stepsize;
-
-		float z = old_pos.z;
-		if (z < 0)
-		{
-			angle = -angle;
-		}
-		angle += stepsize;
-
-		glm::vec3 pos = glm::vec3(radius * cosf(angle), 0.0f, radius * sinf(angle));
-
-		new_vertices.push_back(Vertex{ pos, vertices[i].color, vertices[i].normal, vertices[i].texUV });
-	}
-	*/
-
-
 	// Get new position of center
-	glm::vec3 position = physics.updatePosition(Mesh::ID_num);
+	glm::vec3 newCenterPosition = physics.updatePosition(Mesh::ID_num);
 	// Get current position of center
-	float sum_x = 0.0f;
-	float sum_y = 0.0f;
-	float sum_z = 0.0f;
-	for (int i = 0; i < vertexSize; i++)
-	{
-		sum_x += Mesh::vertices[i].position.x;
-		sum_y += Mesh::vertices[i].position.y;
-		sum_z += Mesh::vertices[i].position.z;
-	}
-	float mean_x = sum_x / vertexSize;
-	float mean_y = sum_y / vertexSize;
-	float mean_z = sum_z / vertexSize;
-	glm::vec3 center = glm::vec3(mean_x, mean_y, mean_z);
+	glm::vec3 center = getCenter(Mesh::vertices, vertexSize);
 
 	// Iterate ove every vertex
 	for (int i = 0; i < vertexSize; i++)
 	{
-		// Get position of vertex relative to the center of the sphere
-		glm::vec3 distanceVector = glm::vec3(Mesh::vertices[i].position.x - center.x, Mesh::vertices[i].position.y - center.y, Mesh::vertices[i].position.z - center.z);
-		// Generate new position of the vertex based on the new center
-		glm::vec3 pos = glm::vec3(position.x + distanceVector.x, position.y + distanceVector.y, position.z + distanceVector.z);
+		glm::vec3 translatedVertex = translate(center, Mesh::vertices[i].position, newCenterPosition);
+		Vertex newVertex = rotate(newCenterPosition, translatedVertex, vertices[i], physics.rotationVector[ID_num], physics.rotationVelocity[ID_num]);
 		// Add new vertex position to vertices
-		new_vertices.push_back(Vertex{ pos, vertices[i].color, vertices[i].normal, vertices[i].texUV });
+		new_vertices.push_back(newVertex);
 	}
 
 	// Update vertices
 	Mesh::vertices = new_vertices;
+
 
 	// Update VAO with new VBO
 	VAO.Bind();
@@ -138,8 +114,62 @@ void Mesh::changePosition(int vertexSize, Physics physics)
 	
 	// Links new VBO vertices to VAO
 	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)(6 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)(9 * sizeof(float)));
 	
 	// Unbind all to prevent accidentally modifying them
 	VAO.Unbind();
 	VBO.Unbind();
+}
+
+glm::vec3 Mesh::translate(glm::vec3 currentCenter, glm::vec3 currentVertexPosition, glm::vec3 newCenterPosition)
+{
+	// Get position of vertex relative to the center of the sphere
+	glm::vec3 distanceVector = glm::vec3(currentVertexPosition.x - currentCenter.x, currentVertexPosition.y - currentCenter.y, currentVertexPosition.z - currentCenter.z);
+	// Generate new position of the vertex based on the new center
+	glm::vec3 pos = glm::vec3(newCenterPosition.x + distanceVector.x, newCenterPosition.y + distanceVector.y, newCenterPosition.z + distanceVector.z);
+
+	return pos; // currentVertexPosition; // 
+}
+
+Vertex Mesh::rotate(glm::vec3 newCenter, glm::vec3 currentVertexPosition, Vertex currentVertex, glm::vec3 rotationVector, float rotationVelocity)
+{
+	float angle = rotationVelocity;
+	glm::vec3 newPosition;
+	glm::vec3 newNormal;
+
+	glm::vec3 distanceVector = glm::vec3(currentVertexPosition.x - newCenter.x, currentVertexPosition.y - newCenter.y, currentVertexPosition.z - newCenter.z);
+
+	// https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+	glm::vec3 newDistanceVector = distanceVector * cos(angle)
+		+ glm::cross(rotationVector, distanceVector) * sin(angle)
+		+ rotationVector * glm::dot(rotationVector, distanceVector) * (1 - cos(angle));
+
+
+	newPosition = newDistanceVector + newCenter;
+
+	newNormal = newDistanceVector; // glm::vec3(newPosition.x - newCenter.x, newPosition.y - newCenter.y, newPosition.z - newCenter.z);
+
+	return Vertex{ newPosition, newNormal, currentVertex.color, currentVertex.texUV };
+}
+
+glm::vec3 Mesh::getCenter(std::vector <Vertex> vertices, int vertexSize)
+{
+	float sum_x = 0.0f;
+	float sum_y = 0.0f;
+	float sum_z = 0.0f;
+	for (int i = 0; i < vertexSize; i++)
+	{
+		sum_x += vertices[i].position.x;
+		sum_y += vertices[i].position.y;
+		sum_z += vertices[i].position.z;
+	}
+	float mean_x = sum_x / vertexSize;
+	float mean_y = sum_y / vertexSize;
+	float mean_z = sum_z / vertexSize;
+
+	glm::vec3 center = glm::vec3(mean_x, mean_y, mean_z);
+
+	return center;
 }

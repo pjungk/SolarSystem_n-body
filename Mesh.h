@@ -22,16 +22,21 @@ public:
 	VBO VBO;
 	// Num of object (planet)
 	int ID_num;
+	float PI;
 
 	// Initializes the mesh
 	Mesh(std::vector <Vertex>& vertices, std::vector <GLuint>& indices, std::vector <Texture>& textures, std::string name, Physics physics);
 
 	// Draws the mesh
 	void Draw(Shader& shader, Camera& camera);
-	// Changes the position of the planet (and all their vertices)
+	// Changes the position and rotation of the planet (and all their vertices)
 	void changePosition(int vertexSize, Physics physics);
-	// Test function for changing the position
-	//void changePosition2(int vertexSize);
+	// Translates a vertex based on the physics calculation
+	glm::vec3 translate(glm::vec3 currentCenter, glm::vec3 currentVertexPosition, glm::vec3 newCenterPosition);
+	// Rotates a vertex based on the physics timestep and a arbitrary angle
+	Vertex rotate(glm::vec3 newCenter, glm::vec3 currentVertexPosition, Vertex currentVertex, glm::vec3 rotationVector, float rotationVelocity);
+	// Get position of planet center
+	glm::vec3 getCenter(std::vector<Vertex> vertices, int vertexSize);
 };
 
 #endif

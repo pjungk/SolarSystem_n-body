@@ -12,43 +12,46 @@ const int stackCount = 30;
 
 int main()
 {
-	Sphere sunSphere = Sphere(glm::vec3(0.0f, 0.0f, 0.0f), 5.0f, sectorCount, stackCount);
+	float scaledPosition[9] = { 0.0f, 0.4f, 0.7f, 1.0f, 1.5f, 5.2f, 9.5f, 19.2f, 30.1f };
+	float scaleFactor = 20.0f;
+
+	Sphere sunSphere = Sphere(glm::vec3(scaledPosition[0]*scaleFactor, 0.0f, 0.0f), 7.0f, sectorCount, stackCount);
 	std::vector<Vertex> sunVertices = sunSphere.getVertices(true);
 	std::vector<GLuint> sunIndices = sunSphere.getIndices();
 
-	Sphere mercurySphere = Sphere(glm::vec3(7.5f, 0.0f, 0.0f), 0.48f, sectorCount, stackCount); // x-pos: 4.0f
+	Sphere mercurySphere = Sphere(glm::vec3(scaledPosition[1] * scaleFactor, 0.0f, 0.0f), 0.48f, sectorCount, stackCount); // x-pos: 4.0f
 	std::vector<Vertex> mercuryVertices = mercurySphere.getVertices(false);
 	std::vector<GLuint> mercuryIndices = mercurySphere.getIndices();
 
-	Sphere venusSphere = Sphere(glm::vec3(10.0f, 0.0f, 0.0f), 1.2f, sectorCount, stackCount); // x-pos: 7.0f
+	Sphere venusSphere = Sphere(glm::vec3(scaledPosition[2] * scaleFactor, 0.0f, 0.0f), 1.2f, sectorCount, stackCount); // x-pos: 7.0f
 	std::vector<Vertex> venusVertices = venusSphere.getVertices(false);
 	std::vector<GLuint> venusIndices = venusSphere.getIndices();
 
-	Sphere earthSphere = Sphere(glm::vec3(15.0f, 0.0f, 0.0f), 1.3f, sectorCount, stackCount); // x-pos: 10.0f
+	Sphere earthSphere = Sphere(glm::vec3(scaledPosition[3] * scaleFactor, 0.0f, 0.0f), 1.3f, sectorCount, stackCount); // x-pos: 10.0f
 	std::vector<Vertex> earthVertices = earthSphere.getVertices(false);
 	std::vector<GLuint> earthIndices = earthSphere.getIndices();
 
-	Sphere marsSphere = Sphere(glm::vec3(18.0f, 0.0f, 0.0f), 0.7f, sectorCount, stackCount); // x-pos: 15.0f
+	Sphere marsSphere = Sphere(glm::vec3(scaledPosition[4] * scaleFactor, 0.0f, 0.0f), 0.7f, sectorCount, stackCount); // x-pos: 15.0f
 	std::vector<Vertex> marsVertices = marsSphere.getVertices(false);
 	std::vector<GLuint> marsIndices = marsSphere.getIndices();
 
-	Sphere jupiterSphere = Sphere(glm::vec3(30.0f, 0.0f, 0.0f), 7.0f, sectorCount, stackCount); // x-pos: 52.0f
+	Sphere jupiterSphere = Sphere(glm::vec3(scaledPosition[5] * scaleFactor, 0.0f, 0.0f), 7.0f, sectorCount, stackCount); // x-pos: 52.0f
 	std::vector<Vertex> jupiterVertices = jupiterSphere.getVertices(false);
 	std::vector<GLuint> jupiterIndices = jupiterSphere.getIndices();
 
-	Sphere saturnSphere = Sphere(glm::vec3(45.0f, 0.0f, 0.0f), 6.0f, sectorCount, stackCount); // x-pos: 95.0f
+	Sphere saturnSphere = Sphere(glm::vec3(scaledPosition[6] * scaleFactor, 0.0f, 0.0f), 6.0f, sectorCount, stackCount); // x-pos: 95.0f
 	std::vector<Vertex> saturnVertices = saturnSphere.getVertices(false);
 	std::vector<GLuint> saturnIndices = saturnSphere.getIndices();
 
-	Sphere uranusSphere = Sphere(glm::vec3(60.0f, 0.0f, 0.0f), 3.0f, sectorCount, stackCount); // x-pos: 192.0f
+	Sphere uranusSphere = Sphere(glm::vec3(scaledPosition[7] * scaleFactor, 0.0f, 0.0f), 3.0f, sectorCount, stackCount); // x-pos: 192.0f
 	std::vector<Vertex> uranusVertices = uranusSphere.getVertices(false);
 	std::vector<GLuint> uranusIndices = uranusSphere.getIndices();
 
-	Sphere neptuneSphere = Sphere(glm::vec3(80.0f, 0.0f, 0.0f), 3.0f, sectorCount, stackCount); // x-pos: 301.0f
+	Sphere neptuneSphere = Sphere(glm::vec3(scaledPosition[8] * scaleFactor, 0.0f, 0.0f), 3.0f, sectorCount, stackCount); // x-pos: 301.0f
 	std::vector<Vertex> neptuneVertices = neptuneSphere.getVertices(false);
 	std::vector<GLuint> neptuneIndices = neptuneSphere.getIndices();
 
-	Sphere backgroundSphere = Sphere(glm::vec3(0.0f, 0.0f, 0.0f), 300.0f, sectorCount, stackCount);
+	Sphere backgroundSphere = Sphere(glm::vec3(0.0f, 0.0f, 0.0f), 1000.0f, sectorCount, stackCount);
 	std::vector<Vertex> backgroundVertices = backgroundSphere.getVertices(false);
 	std::vector<GLuint> backgroundIndices = backgroundSphere.getIndices();
 
@@ -81,7 +84,6 @@ int main()
 	// Specify the viewport of OpenGL in the Window
 	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
 	glViewport(0, 0, width, height);
-
 
 
 	std::vector<Texture> sunTexture = { Texture("Textures/sun_sphere.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
@@ -131,7 +133,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	// Creates camera object
-	Camera camera(width, height, glm::vec3(0.0f, 100.0f, 2.0f));
+	Camera camera(width, height, glm::vec3(0.0f, 300.0f, 2.0f));
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -145,7 +147,7 @@ int main()
 		// Handles camera inputs
 		camera.Inputs(window);
 		// Updates and exports the camera matrix to the Vertex Shader
-		camera.updateMatrix(45.0f, 0.1f, 1000.0f);
+		camera.updateMatrix(45.0f, 0.1f, 1800.0f);
 
 
 		// Draws different meshes
@@ -162,7 +164,7 @@ int main()
 
 
 		// Change position of planets
-		//sun.changePosition(sunVertices.size(), physics);
+		//sun.changePosition(sunVertices.size(), physics); // Breaks stuff
 		mercury.changePosition(mercuryVertices.size(), physics);
 		venus.changePosition(venusVertices.size(), physics);
 		earth.changePosition(earthVertices.size(), physics);
