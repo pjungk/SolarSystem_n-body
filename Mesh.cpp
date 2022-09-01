@@ -7,6 +7,7 @@ Mesh::Mesh(std::vector <Vertex>& vertices, std::vector <GLuint>& indices, std::v
 	Mesh::indices = indices;
 	Mesh::textures = textures;
 
+
 	std::vector <Vertex> initialRotationChange;
 	// Get current position of center
 	glm::vec3 center = getCenter(vertices, vertices.size());
@@ -14,16 +15,23 @@ Mesh::Mesh(std::vector <Vertex>& vertices, std::vector <GLuint>& indices, std::v
 	// Iterate ove every vertex
 	for (int i = 0; i < vertices.size(); i++)
 	{
-		Vertex newVertexPosition = rotate(center, vertices[i].position, vertices[i], glm::vec3(1.0f, 0.0f, 0.0f), acos(-1) / 2.0f);
+		Vertex newVertex = rotate(center, vertices[i].position, vertices[i], glm::vec3(1.0f, 0.0f, 0.0f), acos(-1) / 2.0f);
 		// Add new vertex position to vertices
-		initialRotationChange.push_back(newVertexPosition);
+		if (name == "Sun")
+		{
+			initialRotationChange.push_back(Vertex{ newVertex.position, -newVertex.normal, newVertex.color, newVertex.texUV });
+		}
+		else
+		{
+			initialRotationChange.push_back(newVertex);
+		}
 	}
 	Mesh::vertices = initialRotationChange;
 
 
 	VAO.Bind();
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO.Make(vertices);
+	VBO.Make(Mesh::vertices);
 	// Generates Element Buffer Object and links it to indices
 	EBO EBO(indices);
 	// Links VBO attributes such as coordinates and colors to VAO
@@ -111,14 +119,65 @@ void Mesh::changePosition(int vertexSize, Physics physics)
 	VAO.Bind();
 	// Generates Vertex Buffer Object and links it to vertices
 	VBO.Make(new_vertices);
-	
+
 	// Links new VBO vertices to VAO
 	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
 	VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
 	VAO.LinkAttrib(VBO, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)(6 * sizeof(float)));
 	VAO.LinkAttrib(VBO, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)(9 * sizeof(float)));
-	
+
 	// Unbind all to prevent accidentally modifying them
 	VAO.Unbind();
 	VBO.Unbind();
+}
+
+	glm::vec3 Mesh::translate(glm::vec3 currentCenter, glm::vec3 currentVertexPosition, glm::vec3 newCenterPosition)
+{
+	// Get position of vertex relative to the center of the sphere
+	glm::vec3 distanceVector = glm::vec3(currentVertexPosition.x - currentCenter.x, currentVertexPosition.y - currentCenter.y, currentVertexPosition.z - currentCenter.z);
+	// Generate new position of the vertex based on the new center
+	glm::vec3 pos = glm::vec3(newCenterPosition.x + distanceVector.x, newCenterPosition.y + distanceVector.y, newCenterPosition.z + distanceVector.z);
+
+	return pos; // currentVertexPosition; // 
+}
+
+Vertex Mesh::rotate(glm::vec3 newCenter, glm::vec3 currentVertexPosition, Vertex currentVertex, glm::vec3 rotationVector, float rotationVelocity)
+{
+	float angle = rotationVelocity;
+	glm::vec3 newPosition;
+	glm::vec3 newNormal;
+
+	glm::vec3 distanceVector = glm::vec3(currentVertexPosition.x - newCenter.x, currentVertexPosition.y - newCenter.y, currentVertexPosition.z - newCenter.z);
+
+	// https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+	glm::vec3 newDistanceVector = distanceVector * cos(angle)
+		+ glm::cross(rotationVector, distanceVector) * sin(angle)
+		+ rotationVector * glm::dot(rotationVector, distanceVector) * (1 - cos(angle));
+
+
+	newPosition = newDistanceVector + newCenter;
+
+	newNormal = newDistanceVector; // glm::vec3(newPosition.x - newCenter.x, newPosition.y - newCenter.y, newPosition.z - newCenter.z);
+
+	return Vertex{ newPosition, newNormal, currentVertex.color, currentVertex.texUV };
+}
+
+glm::vec3 Mesh::getCenter(std::vector <Vertex> vertices, int vertexSize)
+{
+	float sum_x = 0.0f;
+	float sum_y = 0.0f;
+	float sum_z = 0.0f;
+	for (int i = 0; i < vertexSize; i++)
+	{
+		sum_x += vertices[i].position.x;
+		sum_y += vertices[i].position.y;
+		sum_z += vertices[i].position.z;
+	}
+	float mean_x = sum_x / vertexSize;
+	float mean_y = sum_y / vertexSize;
+	float mean_z = sum_z / vertexSize;
+
+	glm::vec3 center = glm::vec3(mean_x, mean_y, mean_z);
+
+	return center;
 }

@@ -133,7 +133,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	// Creates camera object
-	Camera camera(width, height, glm::vec3(0.0f, 300.0f, 2.0f));
+	Camera camera(width, height, glm::vec3(50.0f, 0.0f, 150.0f));
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
