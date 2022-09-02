@@ -13,7 +13,7 @@ public:
 	static const int objectCount = 9;
 
 	// Constructor
-	Physics();
+	Physics(bool scaleToReality);
 	// Initialize planet(+sun) positions (and velocities)
 	int initializePosition(std::vector<glm::vec3> object, std::string name);
 	// Initial direction of movement (in cricle around 0,0,0 (sun))
@@ -48,6 +48,7 @@ private:
 	static long long int massScaling;
 	// Needed Constants for Rotation
 	static float rotationAxis[objectCount];
+	static bool scaleToReality;
 };
 
 #endif

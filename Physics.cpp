@@ -1,6 +1,7 @@
 #include "Physics.h"
 
 
+bool Physics::scaleToReality;
 float Physics::timestep = 8640.0f;
 // Initialize scales
 float Physics::astronomicalUnit = 150000000000.0f;
@@ -21,9 +22,11 @@ float Physics::rotationAxis[Physics::objectCount] =		{ 7.25f,	0.034f,		177.36f,	
 glm::vec3 Physics::rotationVector[Physics::objectCount] = {};
 
 
-// Constructor (initializing position and velocity variable)
-Physics::Physics()
+// Constructor (scaleToReality: if true: The positions of the planets defined in the Main.cpp are scaled individually in the physics part to make the behaviour realistic)
+//											However if the masses are then changed the physics look off, because the physics are not to scale in respect to the visual positions.
+Physics::Physics(bool scaleToReality)
 {
+	Physics::scaleToReality = scaleToReality;
 	for (int i = 0; i < Physics::objectCount; i++)
 	{
 		positions[i] = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -49,8 +52,6 @@ int Physics::initializePosition(std::vector<glm::vec3> object, std::string name)
 			float sum_y = 0.0f;
 			float sum_z = 0.0f;
 
-			int test = object.size();
-
 			for (int j = 0; j < object.size(); j++)
 			{
 				sum_x += object[j].x;
@@ -63,13 +64,34 @@ int Physics::initializePosition(std::vector<glm::vec3> object, std::string name)
 			float mean_z = sum_z / object.size();
 
 			// Scale coordinates from graphic coordinates in mesh to real world
-			if (sqrt(pow(mean_x, 2) + pow(mean_y, 2) + pow(mean_z, 2)) == 0)
+			if (sqrt(pow(mean_x, 2) + pow(mean_y, 2) + pow(mean_z, 2)) < 0.5f)
 			{
 				visualToRealityScaler[i] = 0.0f;
 			}
-			else
+			else if (scaleToReality)
 			{
 				visualToRealityScaler[i] = positionScalingAU[i] * float(astronomicalUnit) / sqrt(pow(mean_x, 2) + pow(mean_y, 2) + pow(mean_z, 2));
+			}
+			else // Scale every planet based on the first planets scale (so not the sun)
+			{
+				int scalePos = -1;
+				for (int i = 0; i < objectCount; i++)
+				{
+					if (initialized[i] && i != 0)
+					{
+						scalePos = i;
+						break;
+					}
+				}
+
+				if (scalePos != -1)
+				{
+					visualToRealityScaler[i] = visualToRealityScaler[scalePos];
+				}
+				else
+				{
+					visualToRealityScaler[i] = positionScalingAU[i] * float(astronomicalUnit) / sqrt(pow(mean_x, 2) + pow(mean_y, 2) + pow(mean_z, 2));
+				}
 			}
 			positions[i] = glm::vec3(mean_x, mean_y, mean_z) * visualToRealityScaler[i];
 			// Initialize velocities using real world data

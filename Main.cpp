@@ -82,7 +82,6 @@ int main()
 	//Load GLAD so it configures OpenGL
 	gladLoadGL();
 	// Specify the viewport of OpenGL in the Window
-	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
 	glViewport(0, 0, width, height);
 
 
@@ -98,7 +97,7 @@ int main()
 	std::vector<Texture> backgroundTexture = { Texture("Textures/night_sky_sphere_hd.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE), };
 
 
-	static Physics physics;
+	static Physics physics(false);
 
 	// Possible names: { "Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune" }
 	// Generates Shader object using shaders default.vert and default.frag
@@ -113,7 +112,7 @@ int main()
 	Mesh saturn(saturnVertices, saturnIndices, saturnTexture, "Saturn", physics);
 	Mesh uranus(uranusVertices, uranusIndices, uranusTexture, "Uranus", physics);
 	Mesh neptune(neptuneVertices, neptuneIndices, neptuneTexture, "Neptune", physics);
-	Mesh background(backgroundVertices, backgroundIndices, backgroundTexture, "Sun", physics);
+	Mesh background(backgroundVertices, backgroundIndices, backgroundTexture, "", physics);
 
 
 	// Handle lighting
